@@ -999,6 +999,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	fence->Release();
 	rtvDescriptorHeap->Release();
 	srvDescriptorHeap->Release();
+	dsvDescriptorHeap->Release();
 	swapChainResources[0]->Release();
 	swapChainResources[1]->Release();
 	swapChain->Release();
@@ -1028,7 +1029,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	textureResource->Release();
 	intermediateResource->Release();
-
+	depthStencilResource->Release();
+	dsvDescriptorHeap->Release();
 
 	// COMの終了処理
 	CoUninitialize();
