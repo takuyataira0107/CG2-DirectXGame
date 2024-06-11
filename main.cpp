@@ -895,11 +895,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			
 			
-			transform.rotate.y += 0.03f;
-			/*
-			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-			*wvpData = worldMatrix;
-			*/
+			//transform.rotate.y += 0.03f;
+			
 
 			// WVPMatrix
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -918,9 +915,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::Begin("Object");
 			ImGui::ColorEdit4("*materialData", &materialData->x);
-			ImGui::DragFloat3("*scale", &transform.scale.x);
-			ImGui::DragFloat3("*rotate", &transform.rotate.x);
-			ImGui::DragFloat3("*translate", &transform.translate.x);
+			ImGui::DragFloat3("*scale", &transform.scale.x, 0.01f);
+			ImGui::DragFloat3("*rotate", &transform.rotate.x, 0.01f);
+			ImGui::DragFloat3("*translate", &transform.translate.x, 0.01f);
 			ImGui::End();
 			ImGui::Render();
 
