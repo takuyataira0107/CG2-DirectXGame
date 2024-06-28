@@ -396,7 +396,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Log(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
 			break;
 		}
-		useAdapter = nullptr;   // ソフトウェアアダプタの場合は見なかったことにする
+		useAdapter = nullptr;  // ソフトウェアアダプタの場合は見なかったことにする
 	}
 	// 適切なアダプタが見つからなかったので起動できない
 	assert(useAdapter != nullptr);
@@ -844,7 +844,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			vertexData[start + 1].normal.x = vertexData[start + 1].position.x;
 			vertexData[start + 1].normal.y = vertexData[start + 1].position.y;
 			vertexData[start + 1].normal.z = vertexData[start + 1].position.z;
-
 			// c
 			vertexData[start + 2].position.x = cos(lat) * cos(lon + kLonEvery);
 			vertexData[start + 2].position.y = sin(lat);
@@ -854,33 +853,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			vertexData[start + 2].normal.x = vertexData[start + 2].position.x;
 			vertexData[start + 2].normal.y = vertexData[start + 2].position.y;
 			vertexData[start + 2].normal.z = vertexData[start + 2].position.z;
-
-			// c
-			vertexData[start + 3].position.x = cos(lat) * cos(lon + kLonEvery);
-			vertexData[start + 3].position.y = sin(lat);
-			vertexData[start + 3].position.z = cos(lat) * sin(lon + kLonEvery);
+			// b
+			vertexData[start + 3].position.x = cos(lat + kLatEvery) * cos(lon);
+			vertexData[start + 3].position.y = sin(lat + kLatEvery);
+			vertexData[start + 3].position.z = cos(lat + kLatEvery) * sin(lon);
 			vertexData[start + 3].position.w = 1.0f;
-			vertexData[start + 3].texCoord = { float(lonIndex + 1.0f) / float(kSubdivision), 1.0f - float(latIndex) / float(kSubdivision) };
+			vertexData[start + 3].texCoord = { float(lonIndex) / float(kSubdivision), 1.0f - float(latIndex + 1.0f) / float(kSubdivision) };
 			vertexData[start + 3].normal.x = vertexData[start + 3].position.x;
 			vertexData[start + 3].normal.y = vertexData[start + 3].position.y;
 			vertexData[start + 3].normal.z = vertexData[start + 3].position.z;
-
-			// b
-			vertexData[start + 4].position.x = cos(lat + kLatEvery) * cos(lon);
+			// d
+			vertexData[start + 4].position.x = cos(lat + kLatEvery) * cos(lon + kLonEvery);
 			vertexData[start + 4].position.y = sin(lat + kLatEvery);
-			vertexData[start + 4].position.z = cos(lat + kLatEvery) * sin(lon);
+			vertexData[start + 4].position.z = cos(lat + kLatEvery) * sin(lon + kLonEvery);
 			vertexData[start + 4].position.w = 1.0f;
-			vertexData[start + 4].texCoord = { float(lonIndex) / float(kSubdivision), 1.0f - float(latIndex + 1.0f) / float(kSubdivision) };
+			vertexData[start + 4].texCoord = { float(lonIndex + 1.0f) / float(kSubdivision), 1.0f - float(latIndex + 1.0f) / float(kSubdivision) };
 			vertexData[start + 4].normal.x = vertexData[start + 4].position.x;
 			vertexData[start + 4].normal.y = vertexData[start + 4].position.y;
 			vertexData[start + 4].normal.z = vertexData[start + 4].position.z;
-
-			// d
-			vertexData[start + 5].position.x = cos(lat + kLatEvery) * cos(lon + kLonEvery);
-			vertexData[start + 5].position.y = sin(lat + kLatEvery);
-			vertexData[start + 5].position.z = cos(lat + kLatEvery) * sin(lon + kLonEvery);
+			// c
+			vertexData[start + 5].position.x = cos(lat) * cos(lon + kLonEvery);
+			vertexData[start + 5].position.y = sin(lat);
+			vertexData[start + 5].position.z = cos(lat) * sin(lon + kLonEvery);
 			vertexData[start + 5].position.w = 1.0f;
-			vertexData[start + 5].texCoord = { float(lonIndex + 1.0f) / float(kSubdivision), 1.0f - float(latIndex  + 1.0f) / float(kSubdivision) };
+			vertexData[start + 5].texCoord = { float(lonIndex + 1.0f) / float(kSubdivision), 1.0f - float(latIndex) / float(kSubdivision) };
 			vertexData[start + 5].normal.x = vertexData[start + 5].position.x;
 			vertexData[start + 5].normal.y = vertexData[start + 5].position.y;
 			vertexData[start + 5].normal.z = vertexData[start + 5].position.z;
@@ -989,7 +985,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// Transform変数を作る
 	Transform transform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
-	Transform cameraTransform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -5.0f} };
+	Transform cameraTransform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -7.5f} };
 	// Sprite
 	Transform transformSprite{ {0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 
