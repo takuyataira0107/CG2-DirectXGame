@@ -1082,8 +1082,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 			if (ImGui::CollapsingHeader("Light")) {
 				ImGui::ColorEdit4("LightColor", &directionalLightData->color.x);
-				ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.01f);
-				ImGui::DragFloat("Intensity", &directionalLightData->intensity, 0.01f);
+				ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.01f, -1.0f, 1.0f);
+				ImGui::DragFloat("Intensity", &directionalLightData->intensity, 0.01f,-1.0f,1.0f);
 			}
 			ImGui::End();
 			ImGui::Render();
