@@ -931,6 +931,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// カラー
 	materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	materialData->enableLighting = true;
+	materialData->uvTransform = MakeIdentity4x4();
 
 	// Sprite用のマテリアルリソースを作る
 	ID3D12Resource* materialResourceSprite = CreateBufferResource(device, sizeof(Material));
@@ -940,6 +941,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	materialDataSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	// SpriteはLightingしないのでfalseを設定する
 	materialDataSprite->enableLighting = false;
+	materialDataSprite->uvTransform = MakeIdentity4x4();
 
 	// ライト
 	ID3D12Resource* directionalLightResource = CreateBufferResource(device, sizeof(DirectionalLight));
@@ -1004,7 +1006,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Transform cameraTransform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -7.5f} };
 	// Sprite
 	Transform transformSprite{ {0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
-
+	Transform uvTransformSprite{
+		{ 1.0f, 1.0f, 1.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f, 0.0f },
+	};
 	// Textureの切り替えフラグ
 	static int useTexture = 0;
 
@@ -1059,6 +1065,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
 			transformationMatrixDataSprite->World = worldMatrix;
 
+			// Sprite用のuvTransformMatrixを作る
+			Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
+			uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
+			uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
+			materialDataSprite->uvTransform = uvTransformMatrix;
+
 			ImGui::Begin("Settings");
 			if (ImGui::CollapsingHeader("Texture")) {
 				ImGui::Combo("texture", &useTexture, "resources/uvChecker.png\0resources/monsterBall.png\0\0");
@@ -1068,12 +1080,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				ImGui::DragFloat3("cameraRotate", &cameraTransform.rotate.x, 0.01f);
 				ImGui::DragFloat3("cameraTranslate", &cameraTransform.translate.x, 0.01f);
 			}
-			if (ImGui::CollapsingHeader("Object")) {
-				ImGui::ColorEdit4("color", &materialData->color.x);
+			if (ImGui::CollapsingHeader("Sphere")) {
+				ImGui::ColorEdit4("Sphere.Color", &materialData->color.x);
 				ImGui::CheckboxFlags("enableLighting", &materialData->enableLighting, 1);
-				ImGui::DragFloat3("scale", &transform.scale.x, 0.01f);
-				ImGui::DragFloat3("rotate", &transform.rotate.x, 0.01f);
-				ImGui::DragFloat3("translate", &transform.translate.x, 0.01f);
+				ImGui::DragFloat3("Sphere.Scale", &transform.scale.x, 0.01f);
+				ImGui::DragFloat3("Sphere.Rotate", &transform.rotate.x, 0.01f);
+				ImGui::DragFloat3("Sphere.Translate", &transform.translate.x, 0.01f);
 			}
 			if (ImGui::CollapsingHeader("Sprite")) {
 				ImGui::ColorEdit4("colorSprite", &materialDataSprite->color.x);
@@ -1086,6 +1098,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				ImGui::ColorEdit4("LightColor", &directionalLightData->color.x);
 				ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.01f, -1.0f, 1.0f);
 				ImGui::DragFloat("Intensity", &directionalLightData->intensity, 0.01f,-1.0f,1.0f);
+			}
+			if (ImGui::CollapsingHeader("uvTransform")) {
+				ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+				ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+				ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
 			}
 			ImGui::End();
 			ImGui::Render();
