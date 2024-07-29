@@ -385,7 +385,6 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 				Vector3 normal = normals[elementIndices[2] - 1];
 				//VertexData vertex = { position, texcoord, normal };
 				//modelData.vertices.push_back(vertex);
-				position.x *= -1.0f;
 				texcoord.y = 1.0f - texcoord.y;
 				normal.x *= -1.0f;
 				triangle[faceVertex] = { position, texcoord, normal };
@@ -1166,8 +1165,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			// ゲームの処理
 			
-			transform.rotate.y += 0.005f;
-
 			// WVPMatrix
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
