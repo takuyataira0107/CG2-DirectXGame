@@ -339,7 +339,6 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 	std::vector<Vector3> normals;  // 法線
 	std::vector<Vector2> texcoords;  // テクスチャ座標
 	std::string line;  // ファイルから読んだ1行を格納するもの
-	VertexData triangle[3];
 	// 2. ファイルを開く
 	std::ifstream file(directoryPath + "/" + filename);  // ファイルを開く
 	assert(file.is_open());  // とりあえず開けなかったら止める
@@ -353,6 +352,7 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 		if (identifier == "v") {
 			Vector4 position;
 			s >> position.x >> position.y >> position.z;
+			position.x *= -1.0f;
 			position.w = 1.0f;
 			positions.push_back(position);
 		}
@@ -364,9 +364,11 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 		else if (identifier == "vn") {
 			Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z;
+			normal.x *= -1.0f;
 			normals.push_back(normal);
 		}
 		else if (identifier == "f") {
+			VertexData triangle[3];
 			// 面は三角形限定。その他は未対応
 			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
 				std::string vertexDefinition;
@@ -383,10 +385,7 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 				Vector4 position = positions[elementIndices[0] - 1];
 				Vector2 texcoord = texcoords[elementIndices[1] - 1];
 				Vector3 normal = normals[elementIndices[2] - 1];
-				//VertexData vertex = { position, texcoord, normal };
-				//modelData.vertices.push_back(vertex);
 				texcoord.y = 1.0f - texcoord.y;
-				normal.x *= -1.0f;
 				triangle[faceVertex] = { position, texcoord, normal };
 			}
 			// 頂点を逆順で登録することで、回り順を逆にする
@@ -562,13 +561,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 #endif
 
-
-	/*
-	// 出力ウィンドウへの文字出力
-	Log("Hello,DirectX!\n");
-	*/
-
-
 #pragma region コマンドの生成
 	// コマンドキューを生成する
 	ID3D12CommandQueue* commandQueue = nullptr;
@@ -614,7 +606,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	// モデル読み込み
-	ModelData modelData = LoadObjFile("resources", "plane.obj");
+	ModelData modelData = LoadObjFile("resources", "axis.obj");
 
 	// TexTureを読んで転送する
 	DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
