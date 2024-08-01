@@ -1049,7 +1049,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	// カラー
 	materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialData->enableLighting = true;
+	materialData->enableLighting = 2;
 	materialData->uvTransform = MakeIdentity4x4();
 
 	// マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
@@ -1060,7 +1060,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	materialResourceObj->Map(0, nullptr, reinterpret_cast<void**>(&materialDataObj));
 	// カラー
 	materialDataObj->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	materialDataObj->enableLighting = true;
+	materialDataObj->enableLighting = 2;
 	materialDataObj->uvTransform = MakeIdentity4x4();
 
 	// Sprite用のマテリアルリソースを作る
@@ -1070,7 +1070,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
 	materialDataSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	// SpriteはLightingしないのでfalseを設定する
-	materialDataSprite->enableLighting = false;
+	materialDataSprite->enableLighting = 0;
 	materialDataSprite->uvTransform = MakeIdentity4x4();
 
 	// ライト
@@ -1144,9 +1144,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// cameraTransform
 	Transform cameraTransform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -7.5f} };
 	// SphereTransform
-	Transform transform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+	Transform transform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f} };
 	// ObjTransformを作る
-	Transform transformObj{ {1.0f, 1.0f, 1.0f}, {0.0f, 3.1f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+	Transform transformObj{ {1.0f, 1.0f, 1.0f}, {0.0f, 3.1f, 0.0f}, {1.2f, 0.0f, 0.0f} };
 	// Sprite
 	Transform transformSprite{ {0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 	Transform uvTransformSprite{
@@ -1156,6 +1156,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	};
 	// Textureの切り替えフラグ
 	static int useTexture = 0;
+
+	// Ligthing の切り替え
+	static int useLighting = 0;
 
 	// ImGuiの初期化
 	IMGUI_CHECKVERSION();
@@ -1231,24 +1234,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 			if (ImGui::CollapsingHeader("Sphere")) {
 				ImGui::ColorEdit4("Sphere.Color", &materialData->color.x);
-				ImGui::CheckboxFlags("enableLighting", &materialData->enableLighting, 1);
 				ImGui::DragFloat3("Sphere.Scale", &transform.scale.x, 0.01f);
 				ImGui::DragFloat3("Sphere.Rotate", &transform.rotate.x, 0.01f);
 				ImGui::DragFloat3("Sphere.Translate", &transform.translate.x, 0.01f);
+				ImGui::CheckboxFlags("enableLighting", &materialData->enableLighting, 1);
+				ImGui::Combo("Lighting", &materialData->enableLighting, "None\0Lambert\0HalfLambert");
 			}
 			if (ImGui::CollapsingHeader("OBJ")) {
 				ImGui::ColorEdit4("Obj.Color", &materialDataObj->color.x);
-				ImGui::CheckboxFlags("enableLighting", &materialDataObj->enableLighting, 1);
 				ImGui::DragFloat3("Obj.Scale", &transformObj.scale.x, 0.01f);
 				ImGui::DragFloat3("Obj.Rotate", &transformObj.rotate.x, 0.01f);
 				ImGui::DragFloat3("Obj.Translate", &transformObj.translate.x, 0.01f);
+				ImGui::CheckboxFlags("enableLighting", &materialDataObj->enableLighting, 1);
+				ImGui::Combo("Lighting", &materialDataObj->enableLighting, "None\0Lambert\0HalfLambert");
 			}
 			if (ImGui::CollapsingHeader("Sprite")) {
 				ImGui::ColorEdit4("colorSprite", &materialDataSprite->color.x);
-				ImGui::CheckboxFlags("enableLighting", &materialDataSprite->enableLighting, 1);
 				ImGui::DragFloat3("scaleSprite", &transformSprite.scale.x, 0.01f);
 				ImGui::DragFloat3("rotateSprite", &transformSprite.rotate.x, 0.01f);
 				ImGui::DragFloat3("transformSprite", &transformSprite.translate.x);
+				ImGui::CheckboxFlags("enableLighting", &materialDataSprite->enableLighting, 1);
+				ImGui::Combo("Lighting", &materialDataSprite->enableLighting, "None\0Lambert\0HalfLambert");
 			}
 			if (ImGui::CollapsingHeader("Light")) {
 				ImGui::ColorEdit4("LightColor", &directionalLightData->color.x);
@@ -1299,7 +1305,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->SetGraphicsRootSignature(rootSignature.Get());
 			commandList->SetPipelineState(graphicsPipelineState.Get());  // PSOを設定
 
-			//======================================= sphere =======================================
+			//======================================= Sphere =======================================
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferView);  // VBVを設定
 			// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1308,7 +1314,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			// wvp用のCBufferの場所を設定
 			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 			// SRVのDescriptorTableの先頭を設定。2はrootPrameter[2]である。
-			commandList->SetGraphicsRootDescriptorTable(2, useTexture ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 			// directionalLight
 			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 			// 描画！（DrawCall/ドローコール）。3頂点で1つのインスタンス。インスタンスについては今後
@@ -1326,11 +1332,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			// directionalLight
 			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 			// 描画！（DrawCall/ドローコール）。3頂点で1つのインスタンス。インスタンスについては今後
-			//commandList->DrawInstanced(kSubdivision * kSubdivision * 6, 1, 0, 0);
 			commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 			//======================================================================================
 
-			//======================================= sprite =======================================
+			//======================================= Sprite =======================================
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);  // VBVを設定
 			commandList->IASetIndexBuffer(&indexBufferViewSprite);// IBVを設定
 			// マテリアルCBufferの場所を設定
