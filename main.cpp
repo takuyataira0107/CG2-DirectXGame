@@ -1224,9 +1224,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			materialDataSprite->uvTransform = uvTransformMatrix;
 
 			ImGui::Begin("Settings");
-			if (ImGui::CollapsingHeader("Texture")) {
-				ImGui::Combo("texture", &useTexture, "resources/uvChecker.png\0resources/monsterBall.png\0\0");
-			}
 			if (ImGui::CollapsingHeader("Camera")) {
 				ImGui::DragFloat3("cameraScale", &cameraTransform.scale.x, 0.01f);
 				ImGui::DragFloat3("cameraRotate", &cameraTransform.rotate.x, 0.01f);
